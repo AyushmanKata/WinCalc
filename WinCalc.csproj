@@ -6,5 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyTitle>WinCalc</AssemblyTitle>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="icon.ico"/>
+    <Resource Include="icon.png"/>
+  </ItemGroup>
+
 </Project>

@@ -26,7 +26,10 @@ public partial class MainWindow : Window
         });
     }
 
-    private void Window_Loaded(object s, RoutedEventArgs e) { Activate(); Focus(); }
+    private void Window_Loaded(object s, RoutedEventArgs e) { Icon = new System.Windows.Media.Imaging.BitmapImage(
+        new Uri("pack://application:,,,/icon.png")); 
+    Activate(); 
+    Focus(); }
 
     // ── Title bar ──────────────────────────────────────────────────────────
     private void TitleBar_Drag(object s, MouseButtonEventArgs e)

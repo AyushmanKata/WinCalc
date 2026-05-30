@@ -1,0 +1,289 @@
+<Application x:Class="WinCalc.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="App_Startup">
+    <Application.Resources>
+
+        <!-- Theme color brushes (updated at runtime) -->
+        <SolidColorBrush x:Key="CardBg"    Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="HistBg"    Color="#F5F4F8"/>
+        <SolidColorBrush x:Key="BtnBg"     Color="#EFEFEF"/>
+        <SolidColorBrush x:Key="BtnHover"  Color="#E2E0EA"/>
+        <SolidColorBrush x:Key="BtnPress"  Color="#D5D3DE"/>
+        <SolidColorBrush x:Key="OpBg"      Color="#E4E2EC"/>
+        <SolidColorBrush x:Key="OpHover"   Color="#D8D5E4"/>
+        <SolidColorBrush x:Key="Fg"        Color="#1C1B1F"/>
+        <SolidColorBrush x:Key="SubFg"     Color="#888888"/>
+        <SolidColorBrush x:Key="AccentBg"  Color="#3584E4"/>
+        <SolidColorBrush x:Key="AccentHov" Color="#2C74D0"/>
+        <SolidColorBrush x:Key="TitleBg"   Color="#FAFAF8"/>
+        <SolidColorBrush x:Key="WarnFg"    Color="#CC3333"/>
+        <SolidColorBrush x:Key="HistLine"  Color="#EBEBEB"/>
+
+        <!-- Calc Button -->
+        <Style x:Key="Btn" TargetType="Button">
+            <Setter Property="Background"       Value="{DynamicResource BtnBg}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Fg}"/>
+            <Setter Property="FontSize"         Value="16"/>
+            <Setter Property="FontFamily"       Value="Segoe UI"/>
+            <Setter Property="BorderThickness"  Value="0"/>
+            <Setter Property="Margin"           Value="3"/>
+            <Setter Property="Cursor"           Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Operator Button -->
+        <Style x:Key="OpBtn" TargetType="Button" BasedOn="{StaticResource Btn}">
+            <Setter Property="Background" Value="{DynamicResource OpBg}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource OpHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Equals Button -->
+        <Style x:Key="EqBtn" TargetType="Button" BasedOn="{StaticResource Btn}">
+            <Setter Property="Background" Value="{DynamicResource AccentBg}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize"   Value="22"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentHov}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#2566C8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Icon Button (title bar) -->
+        <Style x:Key="IconBtn" TargetType="Button">
+            <Setter Property="Background"       Value="Transparent"/>
+            <Setter Property="Foreground"       Value="{DynamicResource SubFg}"/>
+            <Setter Property="BorderThickness"  Value="0"/>
+            <Setter Property="Width"            Value="30"/>
+            <Setter Property="Height"           Value="30"/>
+            <Setter Property="Cursor"           Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="FontFamily"       Value="Segoe UI"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Mode ComboBox (themed) -->
+        <Style x:Key="ThemedCombo" TargetType="ComboBox">
+            <Setter Property="Background"       Value="{DynamicResource BtnBg}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Fg}"/>
+            <Setter Property="BorderBrush"      Value="{DynamicResource OpBg}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="FontSize"         Value="14"/>
+            <Setter Property="FontWeight"       Value="SemiBold"/>
+            <Setter Property="FontFamily"       Value="Segoe UI"/>
+            <Setter Property="Padding"          Value="8,4"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    Cursor="Hand">
+                                <Grid Margin="{TemplateBinding Padding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter x:Name="ContentSite"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      VerticalAlignment="Center"
+                                                      IsHitTestVisible="False"/>
+                                    <TextBlock Grid.Column="1" Text="▾" FontSize="10"
+                                               Foreground="{DynamicResource SubFg}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="Transparent" BorderThickness="0" Opacity="0"/>
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False">
+                                <Border Background="{DynamicResource CardBg}"
+                                        BorderBrush="{DynamicResource OpBg}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="4"
+                                        MinWidth="{TemplateBinding ActualWidth}">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="10" ShadowDepth="3" Opacity="0.2" Color="Black"/>
+                                    </Border.Effect>
+                                    <ItemsPresenter/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBox item rows -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background"       Value="Transparent"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Fg}"/>
+            <Setter Property="Padding"          Value="10,6"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="FontFamily"       Value="Segoe UI"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}" CornerRadius="5" Margin="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentBg}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Context Menu -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background"      Value="{DynamicResource CardBg}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource OpBg}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="4"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="3" Opacity="0.2" Color="Black"/>
+                            </Border.Effect>
+                            <StackPanel IsItemsHost="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Menu Item -->
+        <Style TargetType="MenuItem">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Fg}"/>
+            <Setter Property="Padding"         Value="10,7"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="6" Margin="1" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Separator in menu -->
+        <Style TargetType="Separator">
+            <Setter Property="Background" Value="{DynamicResource HistLine}"/>
+            <Setter Property="Margin"     Value="6,3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Height="1" Background="{TemplateBinding Background}"
+                                Margin="{TemplateBinding Margin}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Application.Resources>
+</Application>

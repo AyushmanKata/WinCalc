@@ -26,10 +26,7 @@ public partial class MainWindow : Window
         });
     }
 
-    private void Window_Loaded(object s, RoutedEventArgs e) { Icon = new System.Windows.Media.Imaging.BitmapImage(
-        new Uri("pack://application:,,,/icon.png")); 
-    Activate(); 
-    Focus(); }
+    private void Window_Loaded(object s, RoutedEventArgs e) { Activate(); Focus(); }
 
     // ── Title bar ──────────────────────────────────────────────────────────
     private void TitleBar_Drag(object s, MouseButtonEventArgs e)
@@ -179,14 +176,14 @@ public partial class MainWindow : Window
         else                     BuildBasic();
     }
 
-    // Basic:    5 cols × 5 rows, = at (row3, col4) spanning to row4
+    // Basic: 4 cols × 5 rows
     private static readonly (string L, string K)[][] BasicLayout =
     [
-        [("C","clear"), ("↑n","ceil"),  ("↓n","floor"), ("÷","op"),  ("mod","mod") ],
-        [("7","num"),   ("8","num"),    ("9","num"),     ("×","op"),  ("%","percent")],
-        [("4","num"),   ("5","num"),    ("6","num"),     ("−","op"),  ("( )","paren")],
-        [("1","num"),   ("2","num"),    ("3","num"),     ("+","op"),  ("=","eq")    ],
-        [("0","num"),   (".","num"),    ("±","negate"),  ("","skip"), ("","skip")   ],
+        [("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
+        [("7","num"),    ("8","num"),     ("9","num"),     ("×","op")],
+        [("4","num"),    ("5","num"),     ("6","num"),     ("−","op")],
+        [("1","num"),    ("2","num"),     ("3","num"),     ("+","op")],
+        [("±","negate"), ("0","num"),     (".","num"),     ("=","eq")],
     ];
 
     // Advanced: 7 cols × 5 rows, = at (row3, col6) spanning to row4
@@ -199,7 +196,7 @@ public partial class MainWindow : Window
         [("x⁻¹","inv"), ("x!","fact"), ("±","negate"),  ("0","num"),    (".","num"),    ("+","op"),  ("","skip")  ],
     ];
 
-    private void BuildBasic()    => PlaceLayout(BasicLayout,    5, 5, 54, eqRow: 3, eqCol: 4);
+    private void BuildBasic()    => PlaceLayout(BasicLayout,    4, 5, 54, eqRow: -1, eqCol: -1);
     private void BuildAdvanced() => PlaceLayout(AdvancedLayout, 7, 5, 52, eqRow: 3, eqCol: 6);
 
     private void SetupGrid(int cols, int rows, double rowH)
@@ -214,17 +211,18 @@ public partial class MainWindow : Window
                               double rowH, int eqRow, int eqCol)
     {
         SetupGrid(cols, rows, rowH);
+        bool spanEq = eqRow >= 0;
         for (int r = 0; r < layout.Length; r++)
         for (int c = 0; c < layout[r].Length; c++)
         {
             var (label, kind) = layout[r][c];
             if (string.IsNullOrEmpty(label) || kind == "skip") continue;
-            if (r == eqRow + 1 && c == eqCol) continue; // cell spanned by =
+            if (spanEq && r == eqRow + 1 && c == eqCol) continue;
 
             var btn = MakeBtn(label, kind);
             btn.SetValue(Grid.RowProperty, r);
             btn.SetValue(Grid.ColumnProperty, c);
-            if (kind == "eq") btn.SetValue(Grid.RowSpanProperty, 2);
+            if (spanEq && kind == "eq") btn.SetValue(Grid.RowSpanProperty, 2);
             btnGrid.Children.Add(btn);
         }
     }

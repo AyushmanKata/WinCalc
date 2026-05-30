@@ -34,17 +34,6 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button x:Name="btnBack" Grid.Column="0"
-                            Style="{StaticResource IconBtn}"
-                            Content="&#8592;" FontSize="16"
-                            IsEnabled="False" Click="Back_Click"/>
-
-                    <Button x:Name="btnFwd" Grid.Column="1"
-                            Style="{StaticResource IconBtn}"
-                            Content="&#8594;" FontSize="16"
-                            IsEnabled="False" Margin="2,0,0,0"
-                            Click="Fwd_Click"/>
-
                     <ComboBox x:Name="cmbMode" Grid.Column="2"
                               Style="{StaticResource ThemedCombo}"
                               HorizontalAlignment="Center"

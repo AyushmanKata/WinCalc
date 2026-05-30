@@ -35,8 +35,6 @@ public partial class MainWindow : Window
     }
 
     private void Close_Click(object s, RoutedEventArgs e) => Close();
-    private void Back_Click(object s, RoutedEventArgs e) { }
-    private void Fwd_Click(object s, RoutedEventArgs e) { }
 
     private void Menu_Click(object s, RoutedEventArgs e)
     {

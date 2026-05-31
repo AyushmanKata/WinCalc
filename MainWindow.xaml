@@ -26,42 +26,38 @@
                     Padding="8,6"
                     MouseLeftButtonDown="TitleBar_Drag">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <ComboBox x:Name="cmbMode" Grid.Column="2"
+                    <!-- ComboBox spans full width, centered absolutely -->
+                    <ComboBox x:Name="cmbMode"
                               Style="{StaticResource ThemedCombo}"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               SelectionChanged="Mode_Changed"
                               SelectedIndex="0"
                               MinWidth="120">
-                        <ComboBoxItem Content="Basic"/>
-                        <ComboBoxItem Content="Advanced"/>
-                    </ComboBox>
+					    <ComboBoxItem Content="Basic"/>
+						<ComboBoxItem Content="Advanced"/>
+					</ComboBox>
 
-                    <Button x:Name="btnMenu" Grid.Column="3"
-                            Style="{StaticResource IconBtn}"
-                            Content="&#8801;" FontSize="18"
-                            Click="Menu_Click"/>
-
-                    <Button Grid.Column="4"
-                            Style="{StaticResource IconBtn}"
-                            Margin="2,0,0,0"
-                            Click="Close_Click">
-                        <Border Background="#CC3333" CornerRadius="10"
-                                Width="18" Height="18">
-                            <TextBlock Text="&#10005;" FontSize="9"
-                                       Foreground="White"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Border>
-                    </Button>
+                    <!-- Buttons overlaid, pinned to the right -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <Button x:Name="btnMenu"
+                                Style="{StaticResource IconBtn}"
+                                Content="&#8801;" FontSize="18"
+                                Click="Menu_Click"/>
+                        <Button Style="{StaticResource IconBtn}"
+                                Margin="2,0,0,0"
+                                Click="Close_Click">
+                            <Border Background="#CC3333" CornerRadius="10"
+                                    Width="18" Height="18">
+                                <TextBlock Text="&#10005;" FontSize="9"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
 

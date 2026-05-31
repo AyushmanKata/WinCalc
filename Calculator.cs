@@ -70,6 +70,7 @@ public partial class Calculator
                     "tan"   => Math.Tan(inner * Math.PI / 180).ToString("R"),
                     "ln"    => Math.Log(inner).ToString("R"),
                     "log"   => Math.Log10(inner).ToString("R"),
+                    "exp"   => Math.Exp(inner).ToString("R"),
                     _       => m.Value
                 };
             }
@@ -109,7 +110,7 @@ public partial class Calculator
     [GeneratedRegex(@"\bmod\b", RegexOptions.IgnoreCase)]
     private static partial Regex ModRegex();
 
-    [GeneratedRegex(@"(ceil|floor|abs|sqrt|sin|cos|tan|ln|log)\(([^)]*)\)",
+    [GeneratedRegex(@"(ceil|floor|abs|sqrt|sin|cos|tan|ln|log|exp)\(([^)]*)\)",
         RegexOptions.IgnoreCase)]
     private static partial Regex FuncRegex();
 }

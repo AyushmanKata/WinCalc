@@ -184,18 +184,18 @@ public partial class MainWindow : Window
         [("±","negate"), ("0","num"),     (".","num"),     ("=","eq")],
     ];
 
-    // Advanced: 7 cols × 5 rows, = at (row3, col6) spanning to row4
+    // Advanced: 7 cols × 5 rows, no spanning
     private static readonly (string L, string K)[][] AdvancedLayout =
     [
-        [("x²","sq"),   ("xʸ","pow"),  ("C","clear"),   ("↑n","ceil"),  ("↓n","floor"), ("÷","op"), ("mod","mod")],
-        [("sin","fn"),  ("cos","fn"),  ("tan","fn"),    ("7","num"),    ("8","num"),    ("9","num"), ("×","op")   ],
-        [("ln","ln"),   ("log","log"), ("√","sqrt"),    ("4","num"),    ("5","num"),    ("6","num"), ("−","op")   ],
-        [("π","pi"),    ("e","euler"), ("|x|","abs"),   ("1","num"),    ("2","num"),    ("3","num"), ("=","eq")   ],
-        [("x⁻¹","inv"), ("x!","fact"), ("±","negate"),  ("0","num"),    (".","num"),    ("+","op"),  ("","skip")  ],
+        [("⇄","swap"),  ("Rad","rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("÷","op")],
+        [("sin","fn"),  ("cos","fn"),  ("tan","fn"),  ("7","num"),     ("8","num"),     ("9","num"),     ("×","op")],
+        [("ln","ln"),   ("log","log"), ("1/x","inv"), ("4","num"),     ("5","num"),     ("6","num"),     ("−","op")],
+        [("eˣ","exp"),  ("x²","sq"),   ("xʸ","pow"),  ("1","num"),     ("2","num"),     ("3","num"),     ("+","op")],
+        [("|x|","abs"), ("π","pi"),    ("e","euler"), ("±","negate"),  ("0","num"),     (".","num"),     ("=","eq")],
     ];
 
     private void BuildBasic()    => PlaceLayout(BasicLayout,    4, 5, 54, eqRow: -1, eqCol: -1);
-    private void BuildAdvanced() => PlaceLayout(AdvancedLayout, 7, 5, 52, eqRow: 3, eqCol: 6);
+    private void BuildAdvanced() => PlaceLayout(AdvancedLayout, 7, 5, 52, eqRow: -1, eqCol: -1);
 
     private void SetupGrid(int cols, int rows, double rowH)
     {
@@ -284,6 +284,9 @@ public partial class MainWindow : Window
                 break;
             case "pi":    _c.AppendToExpr("π"); break;
             case "euler": _c.AppendToExpr("e"); break;
+            case "exp":   _c.Expr = $"exp({_c.Expr})";  break;
+            case "swap":  /* reserved for future use */  break;
+            case "rad":   /* reserved for future use */  break;
         }
         RefreshDisplay();
         txtExpr.Focus();

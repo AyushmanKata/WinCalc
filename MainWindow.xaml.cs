@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Runtime.InteropServices;
 
 namespace WinCalc;
 
@@ -26,13 +27,31 @@ public partial class MainWindow : Window
         });
     }
 
-    private void Window_Loaded(object s, RoutedEventArgs e) { Activate(); Focus(); }
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
+
+    private void Window_Loaded(object s, RoutedEventArgs e)
+    {
+        // Apply Windows 11 native rounded corners
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        int pref = DWMWCP_ROUND;
+        DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, sizeof(int));
+
+        Icon = new System.Windows.Media.Imaging.BitmapImage(
+            new Uri("pack://application:,,,/icon.png"));
+        Activate();
+        Focus();
+    }
 
     // ── Title bar ──────────────────────────────────────────────────────────
     private void TitleBar_Drag(object s, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left) DragMove();
     }
+
+    private void Minimize_Click(object s, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void Close_Click(object s, RoutedEventArgs e) => Close();
 

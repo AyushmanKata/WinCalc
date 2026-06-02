@@ -30,7 +30,7 @@ Output: `bin/Release/net8.0-windows/win-x64/publish/WinCalc.exe`
 | **History** | Scrollable step-by-step history; click any row to restore result |
 | **Keyboard** | Full keyboard input + Enter to evaluate, Esc to clear |
 | **Operators** | +  −  ×  ÷  mod  %  ^  ( ) |
-| **Functions** | sin cos tan ln log abs sqrt x! π e |
+| **Functions** | sin cos tan ln log abs sqrt x! π e sin⁻¹ cos⁻¹ tan⁻¹ sinh cosh tanh sinh⁻¹ cosh⁻¹ tanh⁻¹ 2ˣ x³ x! ³√|
 | **Extras** | ±  x⁻¹  x²  xʸ  copy result  clear history |
 
 ## Theme Switching

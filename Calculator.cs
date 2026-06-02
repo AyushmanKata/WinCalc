@@ -36,14 +36,9 @@ public partial class Calculator
              .Replace("÷", "/")
              .Replace("−", "-")
              .Replace(",", "");
-
-        // mod keyword → %
         s = ModRegex().Replace(s, "%");
-
-        // Implicit multiplication: 2( → 2*(   )2 → )*2   2π → 2*π
         s = ImplicitA().Replace(s, "$1*$2");
         s = ImplicitB().Replace(s, "$1*$2");
-
         return s;
     }
 
@@ -65,16 +60,12 @@ public partial class Calculator
 
     [GeneratedRegex(@"\bmod\b", RegexOptions.IgnoreCase)]
     private static partial Regex ModRegex();
-
     [GeneratedRegex(@"(\d)([(πe])")]
     private static partial Regex ImplicitA();
-
     [GeneratedRegex(@"(\))(\d|[(])")]
     private static partial Regex ImplicitB();
 }
 
-// ── Recursive-descent expression parser ───────────────────────────────────
-// Precedence (low → high): +/−  <  *//%  <  ^  <  unary  <  primary
 internal class ExprParser
 {
     private readonly string _s;
@@ -91,20 +82,17 @@ internal class ExprParser
         return result;
     }
 
-    // +  −
     private double AddSub()
     {
         double v = MulDiv();
         while (_pos < _s.Length && (_s[_pos] == '+' || _s[_pos] == '-'))
         {
             char op = _s[_pos++];
-            double r = MulDiv();
-            v = op == '+' ? v + r : v - r;
+            v = op == '+' ? v + MulDiv() : v - MulDiv();
         }
         return v;
     }
 
-    // *  /  %
     private double MulDiv()
     {
         double v = Power();
@@ -117,20 +105,17 @@ internal class ExprParser
         return v;
     }
 
-    // ^  (right-associative: 2^3^2 = 2^9 = 512)
     private double Power()
     {
         double v = Unary();
         if (_pos < _s.Length && _s[_pos] == '^')
         {
             _pos++;
-            double exp = Power(); // recurse for right-associativity
-            v = Math.Pow(v, exp);
+            v = Math.Pow(v, Power()); // right-associative
         }
         return v;
     }
 
-    // unary +  −
     private double Unary()
     {
         if (_pos < _s.Length && _s[_pos] == '-') { _pos++; return -Primary(); }
@@ -140,9 +125,8 @@ internal class ExprParser
 
     private double Primary()
     {
-        if (_pos >= _s.Length) throw new Exception("Unexpected end of expression");
+        if (_pos >= _s.Length) throw new Exception("Unexpected end");
 
-        // Parenthesised sub-expression
         if (_s[_pos] == '(')
         {
             _pos++;
@@ -151,7 +135,6 @@ internal class ExprParser
             return v;
         }
 
-        // Number literal
         if (char.IsDigit(_s[_pos]) || _s[_pos] == '.')
         {
             int start = _pos;
@@ -161,36 +144,45 @@ internal class ExprParser
                 System.Globalization.CultureInfo.InvariantCulture);
         }
 
-        // π constant
         if (_s[_pos] == 'π') { _pos++; return Math.PI; }
 
-        // Named identifiers: constants (e) and functions
         if (char.IsLetter(_s[_pos]))
         {
             int start = _pos;
             while (_pos < _s.Length && char.IsLetter(_s[_pos])) _pos++;
             string name = _s[start.._pos].ToLower();
 
-            // Euler's number — only when NOT followed by (
             if (name == "e" && (_pos >= _s.Length || _s[_pos] != '('))
                 return Math.E;
 
-            // Function call
             if (_pos < _s.Length && _s[_pos] == '(')
             {
-                _pos++; // consume (
+                _pos++;
                 double arg = AddSub();
                 if (_pos < _s.Length && _s[_pos] == ')') _pos++;
 
+                const double D2R = Math.PI / 180;
+                const double R2D = 180 / Math.PI;
+
                 return name switch
                 {
-                    "sin"   => Math.Sin(arg * Math.PI / 180),
-                    "cos"   => Math.Cos(arg * Math.PI / 180),
-                    "tan"   => Math.Tan(arg * Math.PI / 180),
+                    "sin"   => Math.Sin(arg * D2R),
+                    "cos"   => Math.Cos(arg * D2R),
+                    "tan"   => Math.Tan(arg * D2R),
+                    "asin"  => Math.Asin(arg) * R2D,
+                    "acos"  => Math.Acos(arg) * R2D,
+                    "atan"  => Math.Atan(arg) * R2D,
+                    "sinh"  => Math.Sinh(arg),
+                    "cosh"  => Math.Cosh(arg),
+                    "tanh"  => Math.Tanh(arg),
+                    "asinh" => Math.Asinh(arg),
+                    "acosh" => Math.Acosh(arg),
+                    "atanh" => Math.Atanh(arg),
                     "ln"    => Math.Log(arg),
                     "log"   => Math.Log10(arg),
                     "exp"   => Math.Exp(arg),
                     "sqrt"  => Math.Sqrt(arg),
+                    "cbrt"  => Math.Cbrt(arg),
                     "abs"   => Math.Abs(arg),
                     "ceil"  => Math.Ceiling(arg),
                     "floor" => Math.Floor(arg),
@@ -199,6 +191,6 @@ internal class ExprParser
             }
         }
 
-        throw new Exception($"Unexpected character '{_s[_pos]}' at position {_pos}");
+        throw new Exception($"Unexpected '{_s[_pos]}' at {_pos}");
     }
 }

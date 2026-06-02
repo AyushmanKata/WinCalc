@@ -1,8 +1,8 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Runtime.InteropServices;
 
 namespace WinCalc;
 
@@ -12,10 +12,18 @@ public partial class MainWindow : Window
     private readonly App _app = (App)Application.Current;
     private string _mode = "Basic";
     private bool _suppressTextChange;
+    private bool _advancedSwapped;
 
     // Characters allowed in the expression input
     private static readonly HashSet<char> ValidChars =
         [.. "0123456789.+-*/×÷−%^() πe"];
+
+    // ── DWM rounded corners ────────────────────────────────────────────────
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr,
+        ref int attrValue, int attrSize);
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
 
     public MainWindow()
     {
@@ -27,14 +35,8 @@ public partial class MainWindow : Window
         });
     }
 
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
-    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
-    private const int DWMWCP_ROUND = 2;
-
     private void Window_Loaded(object s, RoutedEventArgs e)
     {
-        // Apply Windows 11 native rounded corners
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         int pref = DWMWCP_ROUND;
         DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, sizeof(int));
@@ -51,9 +53,8 @@ public partial class MainWindow : Window
         if (e.ChangedButton == MouseButton.Left) DragMove();
     }
 
+    private void Close_Click(object s, RoutedEventArgs e)    => Close();
     private void Minimize_Click(object s, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-
-    private void Close_Click(object s, RoutedEventArgs e) => Close();
 
     private void Menu_Click(object s, RoutedEventArgs e)
     {
@@ -82,6 +83,7 @@ public partial class MainWindow : Window
         if (cmbMode.SelectedItem is ComboBoxItem item)
         {
             _mode = item.Content.ToString()!;
+            _advancedSwapped = false;
             BuildButtons();
         }
     }
@@ -89,15 +91,12 @@ public partial class MainWindow : Window
     // ── Input filtering ────────────────────────────────────────────────────
     private void txtExpr_PreviewInput(object s, TextCompositionEventArgs e)
     {
-        // Block any character not in ValidChars
         e.Handled = !e.Text.All(c => ValidChars.Contains(c));
     }
 
     private void Expr_Changed(object s, TextChangedEventArgs e)
     {
         if (_suppressTextChange) return;
-
-        // Strip invalid chars (handles paste)
         var raw      = txtExpr.Text;
         var filtered = new string(raw.Where(c => ValidChars.Contains(c)).ToArray());
         if (filtered != raw)
@@ -108,7 +107,6 @@ public partial class MainWindow : Window
             txtExpr.CaretIndex = Math.Min(caret, filtered.Length);
             _suppressTextChange = false;
         }
-
         _c.Expr = txtExpr.Text;
     }
 
@@ -160,16 +158,20 @@ public partial class MainWindow : Window
         var fg    = (Brush)Application.Current.Resources["Fg"];
         var line  = (Brush)Application.Current.Resources["HistLine"];
 
-        histPanel.Children.Add(new Border { Height = 1, Background = line, Margin = new Thickness(0,0,0,1) });
+        histPanel.Children.Add(new Border
+            { Height = 1, Background = line, Margin = new Thickness(0,0,0,1) });
 
         var row = new Grid { Margin = new Thickness(0,1,0,1), Cursor = Cursors.Hand };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        var t1 = new TextBlock { Text = expr,   Foreground = subFg, FontSize = 14, TextTrimming = TextTrimming.CharacterEllipsis };
-        var t2 = new TextBlock { Text = " = ",  Foreground = subFg, FontSize = 14, Margin = new Thickness(4,0,4,0) };
-        var t3 = new TextBlock { Text = result, Foreground = fg,    FontSize = 14, FontWeight = FontWeights.Bold };
+        var t1 = new TextBlock { Text = expr,   Foreground = subFg, FontSize = 14,
+                                 TextTrimming = TextTrimming.CharacterEllipsis };
+        var t2 = new TextBlock { Text = " = ",  Foreground = subFg, FontSize = 14,
+                                 Margin = new Thickness(4,0,4,0) };
+        var t3 = new TextBlock { Text = result, Foreground = fg,    FontSize = 14,
+                                 FontWeight = FontWeights.Bold };
 
         t1.SetValue(Grid.ColumnProperty, 0);
         t2.SetValue(Grid.ColumnProperty, 1);
@@ -188,22 +190,19 @@ public partial class MainWindow : Window
         btnGrid.Children.Clear();
         btnGrid.RowDefinitions.Clear();
         btnGrid.ColumnDefinitions.Clear();
-
         if (_mode == "Advanced") BuildAdvanced();
         else                     BuildBasic();
     }
 
-    // Basic: 4 cols × 5 rows
     private static readonly (string L, string K)[][] BasicLayout =
     [
-        [("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
-        [("7","num"),    ("8","num"),     ("9","num"),     ("×","op")],
-        [("4","num"),    ("5","num"),     ("6","num"),     ("−","op")],
-        [("1","num"),    ("2","num"),     ("3","num"),     ("+","op")],
-        [("±","negate"), ("0","num"),     (".","num"),     ("=","eq")],
+        [("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op") ],
+        [("7","num"),    ("8","num"),     ("9","num"),     ("×","op") ],
+        [("4","num"),    ("5","num"),     ("6","num"),     ("−","op") ],
+        [("1","num"),    ("2","num"),     ("3","num"),     ("+","op") ],
+        [("±","negate"), ("0","num"),     (".","num"),     ("=","eq") ],
     ];
 
-    // Advanced: 7 cols × 5 rows, no spanning
     private static readonly (string L, string K)[][] AdvancedLayout =
     [
         [("⇄","swap"),  ("Rad","rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("÷","op")],
@@ -213,13 +212,27 @@ public partial class MainWindow : Window
         [("|x|","abs"), ("π","pi"),    ("e","euler"), ("±","negate"),  ("0","num"),     (".","num"),     ("=","eq")],
     ];
 
-    private void BuildBasic()    => PlaceLayout(BasicLayout,    4, 5, 54, eqRow: -1, eqCol: -1);
-    private void BuildAdvanced() => PlaceLayout(AdvancedLayout, 7, 5, 52, eqRow: -1, eqCol: -1);
+    private static readonly (string L, string K)[][] AdvancedLayout2 =
+    [
+        [("⇄","swap"),      ("Rad","rad"),    ("³√","cbrt"),    ("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
+        [("sin⁻¹","asin"),  ("cos⁻¹","acos"), ("tan⁻¹","atan"), ("7","num"),   ("8","num"),     ("9","num"),     ("×","op")],
+        [("sinh","sinh"),    ("cosh","cosh"),  ("tanh","tanh"),  ("4","num"),   ("5","num"),     ("6","num"),     ("−","op")],
+        [("sinh⁻¹","asinh"),("cosh⁻¹","acosh"),("tanh⁻¹","atanh"),("1","num"), ("2","num"),     ("3","num"),     ("+","op")],
+        [("2ˣ","pow2"),     ("x³","cube"),    ("x!","fact"),    ("±","negate"),("0","num"),     (".","num"),     ("=","eq")],
+    ];
+
+    private void BuildBasic()    => PlaceLayout(BasicLayout,    4, 5, 54, -1, -1);
+    private void BuildAdvanced()
+    {
+        var layout = _advancedSwapped ? AdvancedLayout2 : AdvancedLayout;
+        PlaceLayout(layout, 7, 5, 52, -1, -1);
+    }
 
     private void SetupGrid(int cols, int rows, double rowH)
     {
         for (int i = 0; i < cols; i++)
-            btnGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            btnGrid.ColumnDefinitions.Add(new ColumnDefinition
+                { Width = new GridLength(1, GridUnitType.Star) });
         for (int i = 0; i < rows; i++)
             btnGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(rowH) });
     }
@@ -248,10 +261,10 @@ public partial class MainWindow : Window
     {
         var styleKey = kind switch
         {
-            "eq"                                          => "EqBtn",
-            "op" or "mod" or "percent" or "paren"
-                 or "clear"                               => "OpBtn",
-            _                                             => "Btn"
+            "eq"                                   => "EqBtn",
+            "op" or "mod" or "percent"
+                or "paren" or "clear"              => "OpBtn",
+            _                                      => "Btn"
         };
         var btn = new Button
         {
@@ -270,6 +283,12 @@ public partial class MainWindow : Window
         {
             case "clear":   ClearAll(); return;
             case "eq":      Calculate(); return;
+            case "swap":
+                _advancedSwapped = !_advancedSwapped;
+                BuildButtons();
+                return;
+            case "rad":     /* Rad/Deg toggle — future */ return;
+
             case "num":     _c.AppendToExpr(label); break;
             case "op":      _c.AppendToExpr(" " + label + " "); break;
             case "mod":     _c.AppendToExpr(" mod "); break;
@@ -279,20 +298,34 @@ public partial class MainWindow : Window
                 int cl = _c.Expr.Count(ch => ch == ')');
                 _c.AppendToExpr(o > cl ? ")" : "(");
                 break;
-            case "ceil":   _c.Expr = $"ceil({_c.Expr})";  break;
-            case "floor":  _c.Expr = $"floor({_c.Expr})"; break;
-            case "abs":    _c.Expr = $"abs({_c.Expr})";   break;
-            case "sqrt":   _c.Expr = $"sqrt({_c.Expr})";  break;
-            case "sq":
-                if (!string.IsNullOrEmpty(_c.Expr)) _c.Expr = $"({_c.Expr})^2";
-                break;
-            case "pow":    _c.AppendToExpr("^");           break;
+
+            case "fn":      _c.Expr = $"{label}({_c.Expr})"; break;
+            case "asin":    _c.Expr = $"asin({_c.Expr})";  break;
+            case "acos":    _c.Expr = $"acos({_c.Expr})";  break;
+            case "atan":    _c.Expr = $"atan({_c.Expr})";  break;
+            case "sinh":    _c.Expr = $"sinh({_c.Expr})";  break;
+            case "cosh":    _c.Expr = $"cosh({_c.Expr})";  break;
+            case "tanh":    _c.Expr = $"tanh({_c.Expr})";  break;
+            case "asinh":   _c.Expr = $"asinh({_c.Expr})"; break;
+            case "acosh":   _c.Expr = $"acosh({_c.Expr})"; break;
+            case "atanh":   _c.Expr = $"atanh({_c.Expr})"; break;
+            case "ln":      _c.Expr = $"ln({_c.Expr})";    break;
+            case "log":     _c.Expr = $"log({_c.Expr})";   break;
+            case "exp":     _c.Expr = $"exp({_c.Expr})";   break;
+            case "sqrt":    _c.Expr = $"sqrt({_c.Expr})";  break;
+            case "cbrt":    _c.Expr = $"cbrt({_c.Expr})";  break;
+            case "abs":     _c.Expr = $"abs({_c.Expr})";   break;
             case "inv":
                 if (!string.IsNullOrEmpty(_c.Expr)) _c.Expr = $"1/({_c.Expr})";
                 break;
-            case "fn":     _c.Expr = $"{label}({_c.Expr})"; break;
-            case "log":    _c.Expr = $"log({_c.Expr})";     break;
-            case "ln":     _c.Expr = $"ln({_c.Expr})";      break;
+            case "sq":
+                if (!string.IsNullOrEmpty(_c.Expr)) _c.Expr = $"({_c.Expr})^2";
+                break;
+            case "cube":
+                if (!string.IsNullOrEmpty(_c.Expr)) _c.Expr = $"({_c.Expr})^3";
+                break;
+            case "pow":     _c.AppendToExpr("^"); break;
+            case "pow2":    _c.Expr = $"2^({_c.Expr})";    break;
             case "fact":
                 if (long.TryParse(_c.Expr, out long n) && n >= 0 && n <= 20)
                 { long f = 1; for (long i = 2; i <= n; i++) f *= i; _c.Expr = f.ToString(); }
@@ -303,9 +336,6 @@ public partial class MainWindow : Window
                 break;
             case "pi":    _c.AppendToExpr("π"); break;
             case "euler": _c.AppendToExpr("e"); break;
-            case "exp":   _c.Expr = $"exp({_c.Expr})";  break;
-            case "swap":  /* reserved for future use */  break;
-            case "rad":   /* reserved for future use */  break;
         }
         RefreshDisplay();
         txtExpr.Focus();

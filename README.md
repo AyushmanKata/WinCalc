@@ -25,12 +25,12 @@ Output: `bin/Release/net8.0-windows/win-x64/publish/WinCalc.exe`
 
 | Feature | Detail |
 |---------|--------|
-| **Modes** | Basic, Advanced, Financial, Programming, Conversion |
+| **Modes** | Basic, Advanced |
 | **Theme** | Light / Dark / System Default (reads Windows registry) |
 | **History** | Scrollable step-by-step history; click any row to restore result |
 | **Keyboard** | Full keyboard input + Enter to evaluate, Esc to clear |
 | **Operators** | +  −  ×  ÷  mod  %  ^  ( ) |
-| **Functions** | sin cos tan ln log abs ceil floor sqrt x! π e |
+| **Functions** | sin cos tan ln log abs sqrt x! π e |
 | **Extras** | ±  x⁻¹  x²  xʸ  copy result  clear history |
 
 ## Theme Switching
@@ -42,7 +42,7 @@ System Default reads `HKCU\...\Themes\Personalize\AppsUseLightTheme`.
 
 ```
 WinCalc/
-├── WinCalc.csproj       # .NET 8 WPF project
+├── WinCalc.csproj         # .NET 8 WPF project
 ├── App.xaml               # Global styles (button templates, combo)
 ├── App.xaml.cs            # Theme switching logic
 ├── MainWindow.xaml        # UI layout

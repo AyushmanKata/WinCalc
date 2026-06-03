@@ -14,7 +14,6 @@ public partial class MainWindow : Window
     private bool _suppressTextChange;
     private bool _advancedSwapped;
 
-    // Characters allowed in the expression input
     private static readonly HashSet<char> ValidChars =
         [.. "0123456789.+-*/×÷−%^() πe"];
 
@@ -205,7 +204,7 @@ public partial class MainWindow : Window
 
     private static readonly (string L, string K)[][] AdvancedLayout =
     [
-        [("⇄","swap"),  ("Rad","rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("÷","op")],
+        [("⇄","swap"),  ("●Deg", "rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("÷","op")],
         [("sin","fn"),  ("cos","fn"),  ("tan","fn"),  ("7","num"),     ("8","num"),     ("9","num"),     ("×","op")],
         [("ln","ln"),   ("log","log"), ("1/x","inv"), ("4","num"),     ("5","num"),     ("6","num"),     ("−","op")],
         [("eˣ","exp"),  ("x²","sq"),   ("xʸ","pow"),  ("1","num"),     ("2","num"),     ("3","num"),     ("+","op")],
@@ -214,7 +213,7 @@ public partial class MainWindow : Window
 
     private static readonly (string L, string K)[][] AdvancedLayout2 =
     [
-        [("⇄","swap"),      ("Rad","rad"),    ("³√","cbrt"),    ("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
+        [("⇄","swap"), ("●Deg", "rad"),    ("³√","cbrt"),    ("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
         [("sin⁻¹","asin"),  ("cos⁻¹","acos"), ("tan⁻¹","atan"), ("7","num"),   ("8","num"),     ("9","num"),     ("×","op")],
         [("sinh","sinh"),    ("cosh","cosh"),  ("tanh","tanh"),  ("4","num"),   ("5","num"),     ("6","num"),     ("−","op")],
         [("sinh⁻¹","asinh"),("cosh⁻¹","acosh"),("tanh⁻¹","atanh"),("1","num"), ("2","num"),     ("3","num"),     ("+","op")],
@@ -269,11 +268,25 @@ public partial class MainWindow : Window
         var btn = new Button
         {
             Content  = label,
+            Tag      = kind,
             Style    = (Style)Application.Current.Resources[styleKey],
             Cursor   = Cursors.Hand
         };
         btn.Click += (_, _) => HandleBtn(label, kind);
         return btn;
+    }
+
+    // Updates Rad/Deg button label to reflect current mode
+    private void UpdateRadButton()
+    {
+        foreach (var child in btnGrid.Children)
+        {
+            if (child is Button btn && btn.Tag as string == "rad")
+            {
+                btn.Content = _c.UseRadians ? "●Rad" : "●Deg";
+                break;
+            }
+        }
     }
 
     // ── Button actions ─────────────────────────────────────────────────────
@@ -287,7 +300,10 @@ public partial class MainWindow : Window
                 _advancedSwapped = !_advancedSwapped;
                 BuildButtons();
                 return;
-            case "rad":     /* Rad/Deg toggle — future */ return;
+            case "rad":
+                _c.UseRadians = !_c.UseRadians;
+                UpdateRadButton();
+                return;
 
             case "num":     _c.AppendToExpr(label); break;
             case "op":      _c.AppendToExpr(" " + label + " "); break;

@@ -9,6 +9,8 @@ public partial class Calculator
     public List<HistoryEntry> History { get; } = [];
     public string Expr { get; set; } = "";
     public bool HasError { get; private set; }
+    public bool UseRadians { get; set; } = false;
+    public bool IsRadMode { get; set; }
 
     public string Evaluate()
     {
@@ -16,7 +18,7 @@ public partial class Calculator
         if (string.IsNullOrEmpty(raw)) return "";
         try
         {
-            var d = ExprParser.Evaluate(Preprocess(raw));
+            var d = ExprParser.Evaluate(Preprocess(raw), UseRadians);
             var result = Format(d);
             History.Add(new HistoryEntry(raw, result));
             Expr = result;
@@ -71,11 +73,14 @@ internal class ExprParser
     private readonly string _s;
     private int _pos;
 
-    private ExprParser(string s) { _s = s; _pos = 0; }
+    // constructor replaced above
 
-    public static double Evaluate(string expr)
+    private readonly bool _isRad;
+    private ExprParser(string s, bool isRad) { _s = s; _isRad = isRad; }
+
+    public static double Evaluate(string expr, bool isRad)
     {
-        var p = new ExprParser(expr.Replace(" ", ""));
+        var p = new ExprParser(expr.Replace(" ", ""), isRad);
         double result = p.AddSub();
         if (p._pos != p._s.Length)
             throw new Exception($"Unexpected '{p._s[p._pos]}' at {p._pos}");
@@ -161,17 +166,17 @@ internal class ExprParser
                 double arg = AddSub();
                 if (_pos < _s.Length && _s[_pos] == ')') _pos++;
 
-                const double D2R = Math.PI / 180;
-                const double R2D = 180 / Math.PI;
+                double d2r = Math.PI / 180.0;
+                double r2d = 180.0 / Math.PI;
 
                 return name switch
                 {
-                    "sin"   => Math.Sin(arg * D2R),
-                    "cos"   => Math.Cos(arg * D2R),
-                    "tan"   => Math.Tan(arg * D2R),
-                    "asin"  => Math.Asin(arg) * R2D,
-                    "acos"  => Math.Acos(arg) * R2D,
-                    "atan"  => Math.Atan(arg) * R2D,
+                    "sin"   => Math.Sin(_isRad ? arg : arg * d2r),
+                    "cos"   => Math.Cos(_isRad ? arg : arg * d2r),
+                    "tan"   => Math.Tan(_isRad ? arg : arg * d2r),
+                    "asin"  => _isRad ? Math.Asin(arg) : Math.Asin(arg) * r2d,
+                    "acos"  => _isRad ? Math.Acos(arg) : Math.Acos(arg) * r2d,
+                    "atan"  => _isRad ? Math.Atan(arg) : Math.Atan(arg) * r2d,
                     "sinh"  => Math.Sinh(arg),
                     "cosh"  => Math.Cosh(arg),
                     "tanh"  => Math.Tanh(arg),

@@ -97,6 +97,16 @@
                                   Padding="14,8,14,0">
                         <StackPanel x:Name="histPanel"/>
                     </ScrollViewer>
+					<TextBlock x:Name="txtPreview"
+           Grid.Row="1"
+           FontSize="22"
+           FontFamily="Segoe UI"
+           Foreground="{DynamicResource SubFg}"
+           TextAlignment="Right"
+           TextTrimming="CharacterEllipsis"
+           VerticalAlignment="Bottom"
+           Margin="14,0,52,2"
+           Opacity="0.75"/>
 
                     <Grid Grid.Row="1" Margin="14,4,10,10">
                         <Grid.ColumnDefinitions>

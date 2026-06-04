@@ -10,7 +10,6 @@ public partial class Calculator
     public string Expr { get; set; } = "";
     public bool HasError { get; private set; }
     public bool UseRadians { get; set; } = false;
-    public bool IsRadMode { get; set; }
 
     public string Evaluate()
     {
@@ -58,6 +57,17 @@ public partial class Calculator
     {
         if (HasError) { Expr = ""; HasError = false; }
         Expr += s;
+    }
+    public string TryPreview()
+    {
+        if (string.IsNullOrWhiteSpace(Expr)) return "";
+        try
+        {
+            var d = ExprParser.Evaluate(Preprocess(Expr), UseRadians);
+            var result = Format(d);
+            return result == Expr.Trim() ? "" : $"= {result}";
+        }
+        catch { return ""; }
     }
 
     [GeneratedRegex(@"\bmod\b", RegexOptions.IgnoreCase)]

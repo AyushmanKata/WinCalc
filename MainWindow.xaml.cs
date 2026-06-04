@@ -107,6 +107,7 @@ public partial class MainWindow : Window
             _suppressTextChange = false;
         }
         _c.Expr = txtExpr.Text;
+        txtPreview.Text = _c.TryPreview();
     }
 
     private void Expr_KeyDown(object s, KeyEventArgs e)
@@ -132,6 +133,7 @@ public partial class MainWindow : Window
             ? (Brush)Application.Current.Resources["WarnFg"]
             : (Brush)Application.Current.Resources["Fg"];
         _suppressTextChange = false;
+        txtPreview.Text = _c.HasError ? "" : _c.TryPreview();
     }
 
     // ── Calculation ────────────────────────────────────────────────────────

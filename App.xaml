@@ -1,6 +1,7 @@
 <Application x:Class="WinCalc.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WinCalc"
              Startup="App_Startup">
     <Application.Resources>
 
@@ -20,6 +21,26 @@
         <SolidColorBrush x:Key="WarnFg"    Color="#CC3333"/>
         <SolidColorBrush x:Key="HistLine"  Color="#EBEBEB"/>
 
+        <!-- Shared ControlTemplate for all calculator buttons. Hover/press
+             colors come from the ButtonChrome attached properties set per
+             style below, so adding a new button variant only needs a Style,
+             not a new template. -->
+        <ControlTemplate x:Key="CalcButtonTemplate" TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="bd" Property="Background"
+                            Value="{Binding Path=(local:ButtonChrome.HoverBrush), RelativeSource={RelativeSource TemplatedParent}}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter TargetName="bd" Property="Background"
+                            Value="{Binding Path=(local:ButtonChrome.PressBrush), RelativeSource={RelativeSource TemplatedParent}}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
         <!-- Calc Button -->
         <Style x:Key="Btn" TargetType="Button">
             <Setter Property="Background"       Value="{DynamicResource BtnBg}"/>
@@ -30,45 +51,16 @@
             <Setter Property="Margin"           Value="3"/>
             <Setter Property="Cursor"           Value="Hand"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="local:ButtonChrome.HoverBrush" Value="{DynamicResource BtnHover}"/>
+            <Setter Property="local:ButtonChrome.PressBrush" Value="{DynamicResource BtnPress}"/>
+            <Setter Property="Template" Value="{StaticResource CalcButtonTemplate}"/>
         </Style>
 
         <!-- Operator Button -->
         <Style x:Key="OpBtn" TargetType="Button" BasedOn="{StaticResource Btn}">
             <Setter Property="Background" Value="{DynamicResource OpBg}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource OpHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BtnPress}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="local:ButtonChrome.HoverBrush" Value="{DynamicResource OpHover}"/>
+            <Setter Property="local:ButtonChrome.PressBrush" Value="{DynamicResource BtnPress}"/>
         </Style>
 
         <!-- Equals Button -->
@@ -76,23 +68,8 @@
             <Setter Property="Background" Value="{DynamicResource AccentBg}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize"   Value="22"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentHov}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#2566C8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="local:ButtonChrome.HoverBrush" Value="{DynamicResource AccentHov}"/>
+            <Setter Property="local:ButtonChrome.PressBrush" Value="#2566C8"/>
         </Style>
 
         <!-- Icon Button (title bar) -->

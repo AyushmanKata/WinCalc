@@ -89,26 +89,28 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <ScrollViewer x:Name="histScroll"
+                                  Grid.Row="0"
                                   VerticalScrollBarVisibility="Hidden"
                                   HorizontalScrollBarVisibility="Disabled"
                                   Padding="14,8,14,0">
                         <StackPanel x:Name="histPanel"/>
                     </ScrollViewer>
-					<TextBlock x:Name="txtPreview"
-           Grid.Row="1"
-           FontSize="22"
-           FontFamily="Segoe UI"
-           Foreground="{DynamicResource SubFg}"
-           TextAlignment="Right"
-           TextTrimming="CharacterEllipsis"
-           VerticalAlignment="Bottom"
-           Margin="14,0,52,2"
-           Opacity="0.75"/>
 
-                    <Grid Grid.Row="1" Margin="14,4,10,10">
+                    <TextBlock x:Name="txtPreview"
+                               Grid.Row="1"
+                               FontSize="22"
+                               FontFamily="Segoe UI"
+                               Foreground="{DynamicResource SubFg}"
+                               TextAlignment="Right"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="14,0,52,0"
+                               Opacity="0.75"/>
+
+                    <Grid Grid.Row="2" Margin="14,0,10,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>

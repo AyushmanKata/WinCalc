@@ -8,11 +8,25 @@ namespace WinCalc;
 
 public partial class MainWindow : Window
 {
+    private enum CalcMode { Basic, Advanced }
+
     private readonly Calculator _c = new();
     private readonly App _app = (App)Application.Current;
-    private string _mode = "Basic";
+    private CalcMode _mode = CalcMode.Basic;
     private bool _suppressTextChange;
     private bool _advancedSwapped;
+
+    // Single-arg function buttons: button kind -> ExprParser function name.
+    // To add a new wrapping function, add one entry here (plus the matching
+    // case in Calculator.ExprParser) — no switch-statement changes needed.
+    private static readonly Dictionary<string, string> WrapFunctions = new()
+    {
+        ["asin"]  = "asin", ["acos"]  = "acos", ["atan"]  = "atan",
+        ["sinh"]  = "sinh", ["cosh"]  = "cosh", ["tanh"]  = "tanh",
+        ["asinh"] = "asinh", ["acosh"] = "acosh", ["atanh"] = "atanh",
+        ["ln"]    = "ln",   ["log"]   = "log",   ["exp"]  = "exp",
+        ["sqrt"]  = "sqrt", ["cbrt"]  = "cbrt",  ["abs"]  = "abs",
+    };
 
     private static readonly HashSet<char> ValidChars =
         [.. "0123456789.+-*/×÷−%^() πe"];
@@ -81,7 +95,7 @@ public partial class MainWindow : Window
         if (btnGrid == null) return;
         if (cmbMode.SelectedItem is ComboBoxItem item)
         {
-            _mode = item.Content.ToString()!;
+            _mode = item.Content.ToString() == "Advanced" ? CalcMode.Advanced : CalcMode.Basic;
             _advancedSwapped = false;
             BuildButtons();
         }
@@ -191,8 +205,8 @@ public partial class MainWindow : Window
         btnGrid.Children.Clear();
         btnGrid.RowDefinitions.Clear();
         btnGrid.ColumnDefinitions.Clear();
-        if (_mode == "Advanced") BuildAdvanced();
-        else                     BuildBasic();
+        if (_mode == CalcMode.Advanced) BuildAdvanced();
+        else                            BuildBasic();
     }
 
     private static readonly (string L, string K)[][] BasicLayout =
@@ -222,11 +236,11 @@ public partial class MainWindow : Window
         [("2ˣ","pow2"),     ("x³","cube"),    ("x!","fact"),    ("±","negate"),("0","num"),     (".","num"),     ("=","eq")],
     ];
 
-    private void BuildBasic()    => PlaceLayout(BasicLayout,    4, 5, 54, -1, -1);
+    private void BuildBasic()    => PlaceLayout(BasicLayout, 4, 5, 54);
     private void BuildAdvanced()
     {
         var layout = _advancedSwapped ? AdvancedLayout2 : AdvancedLayout;
-        PlaceLayout(layout, 7, 5, 52, -1, -1);
+        PlaceLayout(layout, 7, 5, 52);
     }
 
     private void SetupGrid(int cols, int rows, double rowH)
@@ -238,22 +252,18 @@ public partial class MainWindow : Window
             btnGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(rowH) });
     }
 
-    private void PlaceLayout((string L, string K)[][] layout, int cols, int rows,
-                              double rowH, int eqRow, int eqCol)
+    private void PlaceLayout((string L, string K)[][] layout, int cols, int rows, double rowH)
     {
         SetupGrid(cols, rows, rowH);
-        bool spanEq = eqRow >= 0;
         for (int r = 0; r < layout.Length; r++)
         for (int c = 0; c < layout[r].Length; c++)
         {
             var (label, kind) = layout[r][c];
             if (string.IsNullOrEmpty(label) || kind == "skip") continue;
-            if (spanEq && r == eqRow + 1 && c == eqCol) continue;
 
             var btn = MakeBtn(label, kind);
             btn.SetValue(Grid.RowProperty, r);
             btn.SetValue(Grid.ColumnProperty, c);
-            if (spanEq && kind == "eq") btn.SetValue(Grid.RowSpanProperty, 2);
             btnGrid.Children.Add(btn);
         }
     }
@@ -263,8 +273,7 @@ public partial class MainWindow : Window
         var styleKey = kind switch
         {
             "eq"                                   => "EqBtn",
-            "op" or "mod" or "percent"
-                or "paren" or "clear"              => "OpBtn",
+            "op" or "percent" or "paren" or "clear" => "OpBtn",
             _                                      => "Btn"
         };
         var btn = new Button
@@ -309,7 +318,6 @@ public partial class MainWindow : Window
 
             case "num":     _c.AppendToExpr(label); break;
             case "op":      _c.AppendToExpr(" " + label + " "); break;
-            case "mod":     _c.AppendToExpr(" mod "); break;
             case "percent": _c.AppendToExpr("%"); break;
             case "paren":
                 int o = _c.Expr.Count(ch => ch == '(');
@@ -317,22 +325,10 @@ public partial class MainWindow : Window
                 _c.AppendToExpr(o > cl ? ")" : "(");
                 break;
 
-            case "fn":      _c.Expr = $"{label}({_c.Expr})"; break;
-            case "asin":    _c.Expr = $"asin({_c.Expr})";  break;
-            case "acos":    _c.Expr = $"acos({_c.Expr})";  break;
-            case "atan":    _c.Expr = $"atan({_c.Expr})";  break;
-            case "sinh":    _c.Expr = $"sinh({_c.Expr})";  break;
-            case "cosh":    _c.Expr = $"cosh({_c.Expr})";  break;
-            case "tanh":    _c.Expr = $"tanh({_c.Expr})";  break;
-            case "asinh":   _c.Expr = $"asinh({_c.Expr})"; break;
-            case "acosh":   _c.Expr = $"acosh({_c.Expr})"; break;
-            case "atanh":   _c.Expr = $"atanh({_c.Expr})"; break;
-            case "ln":      _c.Expr = $"ln({_c.Expr})";    break;
-            case "log":     _c.Expr = $"log({_c.Expr})";   break;
-            case "exp":     _c.Expr = $"exp({_c.Expr})";   break;
-            case "sqrt":    _c.Expr = $"sqrt({_c.Expr})";  break;
-            case "cbrt":    _c.Expr = $"cbrt({_c.Expr})";  break;
-            case "abs":     _c.Expr = $"abs({_c.Expr})";   break;
+            case "fn":
+                _c.Expr = $"{label}({_c.Expr})";
+                break;
+
             case "inv":
                 if (!string.IsNullOrEmpty(_c.Expr)) _c.Expr = $"1/({_c.Expr})";
                 break;
@@ -354,6 +350,11 @@ public partial class MainWindow : Window
                 break;
             case "pi":    _c.AppendToExpr("π"); break;
             case "euler": _c.AppendToExpr("e"); break;
+
+            default:
+                if (WrapFunctions.TryGetValue(kind, out var fnName))
+                    _c.Expr = $"{fnName}({_c.Expr})";
+                break;
         }
         RefreshDisplay();
         txtExpr.Focus();

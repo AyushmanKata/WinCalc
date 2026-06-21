@@ -37,7 +37,6 @@ public partial class Calculator
              .Replace("÷", "/")
              .Replace("−", "-")
              .Replace(",", "");
-        s = ModRegex().Replace(s, "%");
         s = ImplicitA().Replace(s, "$1*$2");
         s = ImplicitB().Replace(s, "$1*$2");
         return s;
@@ -70,8 +69,6 @@ public partial class Calculator
         catch { return ""; }
     }
 
-    [GeneratedRegex(@"\bmod\b", RegexOptions.IgnoreCase)]
-    private static partial Regex ModRegex();
     [GeneratedRegex(@"(\d)([(πe])")]
     private static partial Regex ImplicitA();
     [GeneratedRegex(@"(\))(\d|[(])")]

@@ -136,7 +136,6 @@ public partial class MainWindow : Window
         if (e.Key == Key.Escape) { e.Handled = true; ClearAll(); }
     }
 
-    private void Backspace_Click(object s, RoutedEventArgs e) { _c.Backspace(); RefreshDisplay(); }
 
     private void RefreshDisplay()
     {
@@ -211,11 +210,11 @@ public partial class MainWindow : Window
 
     private static readonly (string L, string K)[][] BasicLayout =
     [
-        [("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op") ],
-        [("7","num"),    ("8","num"),     ("9","num"),     ("×","op") ],
-        [("4","num"),    ("5","num"),     ("6","num"),     ("−","op") ],
-        [("1","num"),    ("2","num"),     ("3","num"),     ("+","op") ],
-        [("±","negate"), ("0","num"),     (".","num"),     ("=","eq") ],
+        [("C","clear"),  ("( )","paren"), ("%","percent"), ("⌫","back") ],
+        [("7","num"),    ("8","num"),     ("9","num"),     ("÷","op")   ],
+        [("4","num"),    ("5","num"),     ("6","num"),     ("×","op")   ],
+        [("1","num"),    ("2","num"),     ("3","num"),     ("−","op")   ],
+        [("0","num"),    (".","num"),     ("=","eq"),      ("+","op")   ],
     ];
 
     private static readonly (string L, string K)[][] AdvancedLayout =
@@ -273,7 +272,7 @@ public partial class MainWindow : Window
         var styleKey = kind switch
         {
             "eq"                                   => "EqBtn",
-            "op" or "percent" or "paren" or "clear" => "OpBtn",
+            "op" or "percent" or "paren" or "clear" or "back" => "OpBtn",
             _                                      => "Btn"
         };
         var btn = new Button
@@ -306,6 +305,7 @@ public partial class MainWindow : Window
         switch (kind)
         {
             case "clear":   ClearAll(); return;
+            case "back":    _c.Backspace(); break;
             case "eq":      Calculate(); return;
             case "swap":
                 _advancedSwapped = !_advancedSwapped;

@@ -107,14 +107,10 @@
                                Foreground="{DynamicResource SubFg}"
                                TextAlignment="Right"
                                TextTrimming="CharacterEllipsis"
-                               Margin="14,0,52,0"
+                               Margin="14,0,10,0"
                                Opacity="0.75"/>
 
                     <Grid Grid.Row="2" Margin="14,0,10,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
                         <TextBox x:Name="txtExpr"
                                  FontSize="32" FontWeight="Bold"
                                  FontFamily="Segoe UI"
@@ -128,14 +124,6 @@
                                  PreviewTextInput="txtExpr_PreviewInput"
                                  TextChanged="Expr_Changed"
                                  KeyDown="Expr_KeyDown"/>
-                        <Button Grid.Column="1"
-                                Style="{StaticResource IconBtn}"
-                                Width="36" Height="36"
-                                VerticalAlignment="Bottom"
-                                Click="Backspace_Click">
-                            <TextBlock Text="&#9003;" FontSize="18"
-                                       Foreground="{DynamicResource SubFg}"/>
-                        </Button>
                     </Grid>
                 </Grid>
             </Border>

@@ -6,14 +6,14 @@ namespace WinCalc;
 
 public partial class App : Application
 {
-    public enum ThemeMode { Light, Dark, System }
-    public ThemeMode CurrentTheme { get; private set; } = ThemeMode.System;
+    public enum AppTheme { Light, Dark, System }
+    public AppTheme CurrentTheme { get; private set; } = AppTheme.System;
 
     private void App_Startup(object sender, StartupEventArgs e)
     {
         try
         {
-            SetTheme(ThemeMode.System);
+            SetTheme(AppTheme.System);
             var window = new MainWindow();
             window.Show();
             window.Activate();
@@ -26,11 +26,11 @@ public partial class App : Application
         }
     }
 
-    public void SetTheme(ThemeMode mode)
+    public void SetTheme(AppTheme mode)
     {
         CurrentTheme = mode;
-        bool dark = mode == ThemeMode.Dark ||
-                   (mode == ThemeMode.System && IsSystemDark());
+        bool dark = mode == AppTheme.Dark ||
+                   (mode == AppTheme.System && IsSystemDark());
         ApplyColors(dark);
     }
 

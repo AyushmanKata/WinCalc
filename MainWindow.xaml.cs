@@ -72,9 +72,9 @@ public partial class MainWindow : Window
     private void Menu_Click(object s, RoutedEventArgs e)
     {
         var cm = new ContextMenu();
-        cm.Items.Add(MkItem("☀  Light",         () => _app.SetTheme(App.ThemeMode.Light)));
-        cm.Items.Add(MkItem("🌙  Dark",           () => _app.SetTheme(App.ThemeMode.Dark)));
-        cm.Items.Add(MkItem("⚙  System Default", () => _app.SetTheme(App.ThemeMode.System)));
+        cm.Items.Add(MkItem("☀  Light",         () => _app.SetTheme(App.AppTheme.Light)));
+        cm.Items.Add(MkItem("🌙  Dark",           () => _app.SetTheme(App.AppTheme.Dark)));
+        cm.Items.Add(MkItem("⚙  System Default", () => _app.SetTheme(App.AppTheme.System)));
         cm.Items.Add(new Separator());
         cm.Items.Add(MkItem("📋  Copy Result",   CopyResult));
         cm.Items.Add(MkItem("🗑  Clear History", ClearHistory));

@@ -219,20 +219,20 @@ public partial class MainWindow : Window
 
     private static readonly (string L, string K)[][] AdvancedLayout =
     [
-        [("⇄","swap"),  ("●Deg", "rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("÷","op")],
-        [("sin","fn"),  ("cos","fn"),  ("tan","fn"),  ("7","num"),     ("8","num"),     ("9","num"),     ("×","op")],
-        [("ln","ln"),   ("log","log"), ("1/x","inv"), ("4","num"),     ("5","num"),     ("6","num"),     ("−","op")],
-        [("eˣ","exp"),  ("x²","sq"),   ("xʸ","pow"),  ("1","num"),     ("2","num"),     ("3","num"),     ("+","op")],
-        [("|x|","abs"), ("π","pi"),    ("e","euler"), ("±","negate"),  ("0","num"),     (".","num"),     ("=","eq")],
+        [("⇄","swap"),  ("●Deg", "rad"), ("√","sqrt"),  ("C","clear"),   ("( )","paren"), ("%","percent"), ("⌫","back")],
+        [("sin","fn"),  ("cos","fn"),  ("tan","fn"),  ("7","num"),     ("8","num"),     ("9","num"),     ("÷","op")],
+        [("ln","ln"),   ("log","log"), ("1/x","inv"), ("4","num"),     ("5","num"),     ("6","num"),     ("×","op")],
+        [("eˣ","exp"),  ("x²","sq"),   ("xʸ","pow"),  ("1","num"),     ("2","num"),     ("3","num"),     ("−","op")],
+        [("|x|","abs"), ("π","pi"),    ("e","euler"), ("0","num"),     (".","num"),     ("=","eq"),      ("+","op")],
     ];
 
     private static readonly (string L, string K)[][] AdvancedLayout2 =
     [
-        [("⇄","swap"), ("●Deg", "rad"),    ("³√","cbrt"),    ("C","clear"),  ("( )","paren"), ("%","percent"), ("÷","op")],
-        [("sin⁻¹","asin"),  ("cos⁻¹","acos"), ("tan⁻¹","atan"), ("7","num"),   ("8","num"),     ("9","num"),     ("×","op")],
-        [("sinh","sinh"),    ("cosh","cosh"),  ("tanh","tanh"),  ("4","num"),   ("5","num"),     ("6","num"),     ("−","op")],
-        [("sinh⁻¹","asinh"),("cosh⁻¹","acosh"),("tanh⁻¹","atanh"),("1","num"), ("2","num"),     ("3","num"),     ("+","op")],
-        [("2ˣ","pow2"),     ("x³","cube"),    ("x!","fact"),    ("±","negate"),("0","num"),     (".","num"),     ("=","eq")],
+        [("⇄","swap"), ("●Deg", "rad"),    ("³√","cbrt"),    ("C","clear"),  ("( )","paren"), ("%","percent"), ("⌫","back")],
+        [("sin⁻¹","asin"),  ("cos⁻¹","acos"), ("tan⁻¹","atan"), ("7","num"),   ("8","num"),     ("9","num"),     ("÷","op")],
+        [("sinh","sinh"),    ("cosh","cosh"),  ("tanh","tanh"),  ("4","num"),   ("5","num"),     ("6","num"),     ("×","op")],
+        [("sinh⁻¹","asinh"),("cosh⁻¹","acosh"),("tanh⁻¹","atanh"),("1","num"), ("2","num"),     ("3","num"),     ("−","op")],
+        [("2ˣ","pow2"),     ("x³","cube"),    ("x!","fact"),    ("0","num"),     (".","num"),     ("=","eq"),      ("+","op")],
     ];
 
     private void BuildBasic()    => PlaceLayout(BasicLayout, 4, 5, 54);
@@ -343,10 +343,6 @@ public partial class MainWindow : Window
             case "fact":
                 if (long.TryParse(_c.Expr, out long n) && n >= 0 && n <= 20)
                 { long f = 1; for (long i = 2; i <= n; i++) f *= i; _c.Expr = f.ToString(); }
-                break;
-            case "negate":
-                _c.Expr = _c.Expr.StartsWith('-') ? _c.Expr[1..] :
-                          string.IsNullOrEmpty(_c.Expr) ? "" : "-" + _c.Expr;
                 break;
             case "pi":    _c.AppendToExpr("π"); break;
             case "euler": _c.AppendToExpr("e"); break;
